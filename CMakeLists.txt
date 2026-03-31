@@ -7,7 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(BUILD_TESTS "Build tests" OFF)
 option(COVERAGE "Enable coverage reporting" OFF)
 
-add_library(banking STATIC
+# Используем SHARED библиотеку для корректной работы gcov
+add_library(banking SHARED
     Account.cpp
     Transaction.cpp
 )
@@ -44,6 +45,8 @@ if(BUILD_TESTS)
     target_link_libraries(banking_test PRIVATE banking gtest_main gmock)
     
     if(COVERAGE)
+        target_compile_options(banking_test PRIVATE --coverage -O0 -g)
+        target_link_options(banking_test PRIVATE --coverage)
         target_link_libraries(banking_test PRIVATE gcov)
     endif()
     
