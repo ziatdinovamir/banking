@@ -14,32 +14,9 @@ jobs:
     - uses: actions/checkout@v4
     
     - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y lcov
+      run: sudo apt-get update && sudo apt-get install -y lcov
     
     - name: Configure CMake
-      run: cmake -B build -DBUILD_TESTS=ON
-    
-    - name: Build
-      run: cmake --build build
-    
-    - name: Run tests
-      working-directory: build
-      run: ctest --output-on-failure
-    
-  coverage:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y lcov
-    
-    - name: Configure CMake with coverage
       run: cmake -B build -DBUILD_TESTS=ON -DCOVERAGE=ON
     
     - name: Build
@@ -52,8 +29,8 @@ jobs:
     - name: Collect coverage
       working-directory: build
       run: |
-        lcov --capture --directory . --output-file coverage.info
-        lcov --remove coverage.info '/usr/*' '*/googletest/*' '*/tests/*' --output-file coverage.info
+        lcov --capture --directory . --output-file coverage.info --ignore-errors unused
+        lcov --remove coverage.info '/usr/*' '*/googletest/*' '*/gtest/*' '*/_deps/*' '*/tests/*' --output-file coverage.info --ignore-errors unused
         lcov --list coverage.info
     
     - name: Upload to Coveralls
