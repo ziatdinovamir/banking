@@ -20,3 +20,4 @@ cmake .. -DBUILD_TESTS=ON
 cmake --build .
 ctest --output-on-failure
 
+
