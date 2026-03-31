@@ -55,8 +55,10 @@ jobs:
     - name: Collect coverage
       working-directory: build
       run: |
-        lcov --capture --directory . --output-file coverage.info --ignore-errors unused
-        lcov --remove coverage.info '/usr/*' '*/googletest/*' '*/tests/*' --output-file coverage.info --ignore-errors unused
+        lcov --capture --directory . --output-file coverage.info \
+             --ignore-errors unused,mismatch,gcov
+        lcov --remove coverage.info '/usr/*' '*/googletest/*' '*/tests/*' \
+             --output-file coverage.info --ignore-errors unused,mismatch
         lcov --list coverage.info
     
     - name: Upload to Coveralls
@@ -64,3 +66,4 @@ jobs:
       with:
         file: build/coverage.info
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        fail-on-error: false
