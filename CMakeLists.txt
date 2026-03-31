@@ -8,12 +8,12 @@ option(BUILD_TESTS "Build tests" OFF)
 option(COVERAGE "Enable coverage reporting" OFF)
 
 add_library(banking STATIC
-    Account.cpp
-    Transaction.cpp
+    src/Account.cpp
+    src/Transaction.cpp
 )
 
 target_include_directories(banking PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
 if(COVERAGE)
@@ -37,20 +37,21 @@ if(BUILD_TESTS)
     FetchContent_MakeAvailable(googletest)
     
     add_executable(banking_test
-        test_account.cpp
-        test_transaction.cpp
+        tests/test_account.cpp
+        tests/test_transaction.cpp
+        tests/test_real_accounts.cpp
     )
     
     target_link_libraries(banking_test PRIVATE banking gtest_main gmock)
     
-    if(COVERAGE)
-        target_link_libraries(banking_test PRIVATE gcov)
-    endif()
-    
     target_include_directories(banking_test PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/mocks
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
     )
+    
+    if(COVERAGE)
+        target_compile_options(banking_test PRIVATE --coverage -O0 -g)
+        target_link_options(banking_test PRIVATE --coverage)
+    endif()
     
     add_test(NAME banking_test COMMAND banking_test)
 endif()
