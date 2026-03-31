@@ -7,11 +7,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(BUILD_TESTS "Build tests" OFF)
 option(COVERAGE "Enable coverage reporting" OFF)
 
-# Используем SHARED библиотеку для корректной работы gcov
-add_library(banking SHARED
-    Account.cpp
-    Transaction.cpp
-)
+# На Windows используем статическую библиотеку, на Linux - shared для coverage
+if(COVERAGE AND NOT WIN32)
+    add_library(banking SHARED
+        Account.cpp
+        Transaction.cpp
+    )
+else()
+    add_library(banking STATIC
+        Account.cpp
+        Transaction.cpp
+    )
+endif()
 
 target_include_directories(banking PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
