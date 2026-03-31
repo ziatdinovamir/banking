@@ -16,7 +16,7 @@ target_include_directories(banking PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-if(COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+if(COVERAGE)
     target_compile_options(banking PRIVATE --coverage -O0 -g)
     target_link_options(banking PRIVATE --coverage)
 endif()
@@ -42,6 +42,10 @@ if(BUILD_TESTS)
     )
     
     target_link_libraries(banking_test PRIVATE banking gtest_main gmock)
+    
+    if(COVERAGE)
+        target_link_libraries(banking_test PRIVATE gcov)
+    endif()
     
     target_include_directories(banking_test PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
