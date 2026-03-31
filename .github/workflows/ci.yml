@@ -59,8 +59,14 @@ jobs:
       run: |
         lcov --capture --directory . --output-file coverage.info \
              --ignore-errors unused,mismatch,gcov
-        lcov --remove coverage.info '/usr/*' '*/googletest/*' '*/tests/*' \
-             --output-file coverage.info --ignore-errors unused,mismatch
+        lcov --remove coverage.info \
+             '/usr/*' \
+             '*/googletest/*' \
+             '*/tests/*' \
+             '*/test_*.cpp' \
+             '*/mocks/*' \
+             --output-file coverage.info \
+             --ignore-errors unused,mismatch
         lcov --list coverage.info
     
     - name: Upload to Coveralls
