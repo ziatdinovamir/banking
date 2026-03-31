@@ -7,17 +7,23 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(BUILD_TESTS "Build tests" OFF)
 option(COVERAGE "Enable coverage reporting" OFF)
 
-# На Windows используем статическую библиотеку, на Linux - shared для coverage
-if(COVERAGE AND NOT WIN32)
-    add_library(banking SHARED
-        Account.cpp
-        Transaction.cpp
-    )
-else()
+if(WIN32)
     add_library(banking STATIC
         Account.cpp
         Transaction.cpp
     )
+else()
+    if(COVERAGE)
+        add_library(banking SHARED
+            Account.cpp
+            Transaction.cpp
+        )
+    else()
+        add_library(banking STATIC
+            Account.cpp
+            Transaction.cpp
+        )
+    endif()
 endif()
 
 target_include_directories(banking PUBLIC
@@ -40,6 +46,7 @@ if(BUILD_TESTS)
         googletest
         GIT_REPOSITORY https://github.com/google/googletest.git
         GIT_TAG v1.14.0
+        GIT_SHALLOW TRUE
     )
     
     FetchContent_MakeAvailable(googletest)

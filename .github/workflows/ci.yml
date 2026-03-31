@@ -58,16 +58,17 @@ jobs:
       working-directory: build
       run: |
         lcov --capture --directory . --output-file coverage.info \
-             --ignore-errors unused,mismatch,gcov
+             --ignore-errors unused,mismatch,gcov,empty
         lcov --remove coverage.info \
              '/usr/*' \
              '*/googletest/*' \
              '*/tests/*' \
              '*/test_*.cpp' \
              '*/mocks/*' \
-             --output-file coverage.info \
-             --ignore-errors unused,mismatch
-        lcov --list coverage.info
+             --output-file coverage_filtered.info \
+             --ignore-errors unused,mismatch,empty
+        lcov --list coverage_filtered.info --ignore-errors unused
+        cp coverage_filtered.info coverage.info
     
     - name: Upload to Coveralls
       uses: coverallsapp/github-action@v2
