@@ -7,14 +7,19 @@ on:
     branches: [ main, master ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     
     steps:
     - uses: actions/checkout@v4
     
-    - name: Configure CMake
-      run: cmake -B build -DBUILD_TESTS=ON
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y lcov
+    
+    - name: Configure CMake with coverage
+      run: cmake -B build -DBUILD_TESTS=ON -DCOVERAGE=ON
     
     - name: Build
       run: cmake --build build
@@ -22,3 +27,16 @@ jobs:
     - name: Run tests
       working-directory: build
       run: ctest --output-on-failure
+    
+    - name: Collect coverage
+      working-directory: build
+      run: |
+        lcov --capture --directory . --output-file coverage.info
+        lcov --remove coverage.info '/usr/*' '*/googletest/*' '*/tests/*' --output-file coverage.info
+        lcov --list coverage.info
+    
+    - name: Upload to Coveralls
+      uses: coverallsapp/github-action@v2
+      with:
+        file: build/coverage.info
+        github-token: ${{ secrets.GITHUB_TOKEN }}

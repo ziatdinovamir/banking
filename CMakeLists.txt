@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(BUILD_TESTS "Build tests" OFF)
+option(COVERAGE "Enable coverage reporting" OFF)
 
 add_library(banking STATIC
     Account.cpp
@@ -14,6 +15,11 @@ add_library(banking STATIC
 target_include_directories(banking PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+if(COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(banking PRIVATE --coverage -O0 -g)
+    target_link_options(banking PRIVATE --coverage)
+endif()
 
 if(BUILD_TESTS)
     enable_testing()
